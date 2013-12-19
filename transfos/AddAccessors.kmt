@@ -1,0 +1,137 @@
+/* $Id:$ 
+ * Creation : October 14, 2008
+ * Licence  : EPL 
+ * Copyright:
+ * Authors  : 
+ *            
+ */
+@mainClass "Transf::Main"
+@mainOperation "main"
+
+package Transf;
+
+require kermeta
+
+// m�ta-mod�le du diagramme de classe
+require "platform:/resource/ClassDiagram/metaModels/ClassDiagram.ecore"
+
+// fonctions utilitaires Kermeta associ�es au MM de diagramme de classe
+require "platform:/resource/ClassDiagram/metaModels/ClassDiagramUtil.kmt"
+
+
+using kermeta::persistence
+using kermeta::exceptions
+using kermeta::standard
+
+// package du m�ta-mod�le
+using ClassDiagram
+
+// package des fonctions utilitaires
+using ClassDiagramUtil
+ 
+class Main
+{
+	
+	// hack pour avoir n'importe o� une r�f�rence sur le type void
+	reference voidT : VoidType
+	
+	// check if the attribute has already a getter method
+	operation hasGetter(att : ClassDiagram::Attribute) : Boolean is do
+		result := att.owner.methods.exists { m |
+			if (m.name.size <=3)
+			then
+				false
+			else
+				m.name.substring(0,3).equals("get") and
+				m.name.substring(3,4).equals( att.name.substring(0,1).toUpperCase) and
+				m.name.substring(4,m.name.size).equals(att.name.substring(1,att.name.size)) and  
+			
+				m.returnType == att.type and
+				m.parameters.isEmpty()
+			end
+		}
+	end
+	
+	// check if the attribute has already a setter method
+	operation hasSetter(att : ClassDiagram::Attribute) : Boolean is do
+		result := att.owner.methods.exists { m |
+			if (m.name.size <=3)
+			then
+				false
+			else
+				m.name.substring(0,3).equals("set") and
+				m.name.substring(3,4).equals( att.name.substring(0,1).toUpperCase) and
+				m.name.substring(4,m.name.size).equals(att.name.substring(1,att.name.size)) and  
+
+				m.returnType.name.equals("void") and
+				m.parameters.size() == 1 and
+				m.parameters.exists { p | p.type == att.type }
+			end
+		}
+	end
+	
+	
+	// Modify the model in the following way :
+	// - if an attribute is missing a getter and/or setter method, add the required
+	// methods on the class diagram
+	// - return the modified model
+	operation addAccessors(base : ClassDiagram::ModelBase) : ClassDiagram::ModelBase is do
+		base.allClasses.each { cl |
+			cl.attributes.each { att |
+				var met : ClassDiagram::Method
+				var param : ClassDiagram::Parameter
+				
+				stdio.write(" Classe "+cl.name +" : attribut : "+att.name+" , a un getter : "+hasGetter(att).toString())
+				stdio.writeln(" , a un setter : " +hasSetter(att).toString())
+				
+				// create the getter method if necessary
+				if not(hasGetter(att)) then
+					met := ClassDiagram::Method.new
+					met.name := "get"+ att.name.substring(0,1).toUpperCase + att.name.substring(1,att.name.size)
+					met.returnType := att.type
+					cl.methods.add(met)
+				end
+				
+				// create the setter method if necessary
+				if not(hasSetter(att)) then
+					met := ClassDiagram::Method.new
+					met.name := "set" + att.name.substring(0,1).toUpperCase + att.name.substring(1,att.name.size)
+					met.returnType := base.voidT
+					param := Parameter.new
+					param.name := "value"
+					param.type := att.type
+					param.multiplicity := 1
+					param.owner := met
+					cl.methods.add(met)
+				end
+			}
+		}
+		result := base
+	end
+
+	
+	operation main() : Void is do 
+
+		// creation of the util object for loading/saving/printing models
+		var util : ClassDiagramUtil::Util init ClassDiagramUtil::Util.new
+					
+		var source : ClassDiagram::ModelBase
+		var target : ClassDiagram::ModelBase
+		
+		source := util.loadModel("platform:/resource/ClassDiagram/models/ModelBase.xmi")
+		voidT := source.voidT
+		
+		stdio.writeln(" === modele source ===\n")
+		util.printModel(source)
+			
+		stdio.writeln("")	
+		target := addAccessors(source)
+		
+		stdio.writeln("\n === modele cible ====\n")
+		util.printModel(target)
+			
+		util.saveModel(target, "platform:/resource/ClassDiagram/models/ModelBaseAccessorKermeta.xmi")
+		stdio.writeln(" === modele cible sauvegarde ===")
+		
+	end
+}

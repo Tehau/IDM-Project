@@ -1,0 +1,8 @@
+bin/*
+META-INF/*
+metaModels/*
+src/*
+*.properties
+plugin.xml
+.classpath
+.project

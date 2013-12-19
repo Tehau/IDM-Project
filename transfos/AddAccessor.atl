@@ -1,0 +1,272 @@
+-- @path ClassDiagram=/ClassDiagram/metaModels/ClassDiagram.ecore
+
+-- AddAccessor.atl 
+--
+--
+-- Transformation ATL qui raffine un diagramme de classes (meta-modèle : ClassDiagram.ecore)
+--
+-- Pour chaque attribut de chaque classe, rajoute un setter et un getter (si ces méthodes
+-- n'existaient pas déjà). 2 étapes dans la transfo : 
+-- 1) Duplication de la base du modèle qui doit se faire de manièe explicite (tous
+--    les autres types d'éléments seront implicitement crées)
+-- 2) Duplication explicite des attributs avec création du getter et/ou du setter (voire aucun des 2)
+--    selon le cas. Cela donne 4 règles pour les attributs.
+--
+-- Tous les autres éléments sont dupliqués tels quels
+--
+-- Eric Cariou / Octobre 2008, modifié Décembre 2013
+
+
+module AddAccessorRefining;
+create cible : ClassDiagram from source : ClassDiagram;
+
+-- ****************************************************************
+-- Helpers utilisés par la transformation 
+
+-- retourne la chaine courante avec premier caractère en majuscule
+helper context String def: firstToUpper() : String =
+	self.substring(1, 1).toUpper() + self.substring(2, self.size());
+
+-- retourne la référence sur le type void (supposé unique et présent)
+helper def: voidType : ClassDiagram!VoidType =
+	ClassDiagram!VoidType.allInstances() -> asSequence() -> first();
+
+-- vérifie qu'un attribut possède un getter 
+helper context ClassDiagram!Attribute def: hasGetter() : Boolean = 
+	self.owner.methods -> exists ( m |
+		m.name = 'get' + self.name.firstToUpper() and
+		m.parameters -> isEmpty() and
+		m.returnType = self.type
+ 	);
+
+-- vérifie qu'un attribut possède un setter 
+helper context ClassDiagram!Attribute def: hasSetter() : Boolean = 
+	self.owner.methods -> exists ( m |
+		m.name = 'set' + self.name.firstToUpper() and
+		m.parameters -> size() = 1 and
+		m.parameters-> exists( p | p.type = self.type ) and
+		m.returnType = thisModule.voidType
+ 	);
+
+-- ********************************************************************
+-- Duplication de tous les éléments du modèle à l'identique, sauf les attributs 
+-- car il faut d'abord vérifier s'ils ont un setter ou un getter pour les générer
+-- en complément.
+
+rule duplicateModelBase {
+from
+	sourceBase : ClassDiagram!ModelBase
+to
+	cibleBase : ClassDiagram!ModelBase (
+		allClasses <- sourceBase.allClasses,
+		allInterfaces <- sourceBase.allInterfaces,
+		allAssociations <- sourceBase.allAssociations,
+		voidT <- sourceBase.voidT,
+		intT <- sourceBase.intT,
+		stringT <- sourceBase.stringT,
+		boolT <- sourceBase.boolT
+	)
+}
+
+rule duplicateClass {
+from
+	sourceClass : ClassDiagram!Class
+to
+	cibleClass : ClassDiagram!Class (
+		name <- sourceClass.name,
+		attributes <- sourceClass.attributes,
+		methods <- sourceClass.methods,
+		interfaces <- sourceClass.interfaces,
+		associations <- sourceClass.associations
+	)
+}
+
+rule duplicateInterface  {
+from
+	interfaceSource : ClassDiagram!Interface
+to
+	interfaceCible : ClassDiagram!Interface (
+		name <- interfaceSource.name,
+		methods <- interfaceSource.methods,
+		implementedBy <- interfaceSource.implementedBy
+	)
+}
+
+rule duplicateParameter {
+from
+	paramSource : ClassDiagram!Parameter
+to
+	paramCible : ClassDiagram!Parameter (
+		name <- paramSource.name,
+		owner <- paramSource.owner,
+		multiplicity <- paramSource.multiplicity,
+		type <- paramSource.type
+	)
+}
+
+rule duplicateMethod {
+from
+	methodSource : ClassDiagram!Method
+to
+	methodCible : ClassDiagram!Method (
+		name <- methodSource.name,
+		owner <- methodSource.owner,
+		returnType <- methodSource.returnType,
+		parameters <- methodSource.parameters
+	)
+}
+
+rule duplicateAssociationEnd {
+from
+	aeSource : ClassDiagram!AssociationEnd
+to
+	aeCible : ClassDiagram!AssociationEnd (
+		name <- aeSource.name,
+		lowerBound <- aeSource.lowerBound,
+		upperBound <- aeSource.upperBound,
+		_class <- aeSource._class,
+		association <- aeSource.association
+	)
+}
+
+rule duplicateAssociation {
+from
+	associationSource : ClassDiagram!Association 
+to
+	associationCible : ClassDiagram!Association (
+		name <- associationSource.name,
+		ends <- associationSource.ends
+	)
+}
+
+rule duplicationVoidType {
+from
+	voidTypeSource : ClassDiagram!VoidType 
+to
+	voidTypeCible : ClassDiagram!VoidType (
+		name <- voidTypeSource.name
+	)
+}
+
+rule duplicationIntegerType {
+from
+	integerTypeSource : ClassDiagram!IntegerType 
+to
+	integerTypeCible : ClassDiagram!IntegerType (
+		name <- integerTypeSource.name
+	)
+}
+
+rule duplicationStringType {
+from
+	stringTypeSource : ClassDiagram!StringType 
+to
+	stringTypeCible : ClassDiagram!StringType (
+		name <- stringTypeSource.name
+	)
+}
+
+rule duplicationBooleanType {
+from
+	booleanTypeSource : ClassDiagram!BooleanType 
+to
+	booleanTypeCible : ClassDiagram!BooleanType (
+		name <- booleanTypeSource.name
+	)
+}
+
+
+-- **********************************************************************
+-- Duplication des attributs, avec création au besoin des méthodes getter
+-- et setter associées. 4 régles selon que l'attribut possède :
+-- 1) Déjà son getter et son setter
+-- 2) Un setter mais pas de getter
+-- 3) Un getter mais pas de setter
+-- 4) Ni setter ni getter
+
+rule attributeHasAll {
+from 
+	attSource : ClassDiagram!Attribute (
+		attSource.hasSetter() and attSource.hasGetter())
+to
+	attTarget : ClassDiagram!Attribute (
+		name <- attSource.name,
+		owner <- attSource.owner,
+		type <- attSource.type,
+		multiplicity <- attSource.multiplicity
+	)
+}
+	
+rule attributeHasSetter {
+from 
+	attSource : ClassDiagram!Attribute (
+		attSource.hasSetter() and not(attSource.hasGetter())
+	)
+to
+	attTarget : ClassDiagram!Attribute (
+		name <- attSource.name,
+		owner <- attSource.owner,
+		type <- attSource.type,
+		multiplicity <- attSource.multiplicity
+	),	
+	getter : ClassDiagram!Method (
+		name <- 'get' + attSource.name.firstToUpper(),
+		returnType <- attTarget.type,
+		owner <- attTarget.owner
+	)
+}
+
+rule attributeHasGetter {
+from
+	attSource : ClassDiagram!Attribute (
+		not(attSource.hasSetter()) and attSource.hasGetter()
+	)
+to
+	attTarget : ClassDiagram!Attribute (
+		name <- attSource.name,
+		owner <- attSource.owner,
+		type <- attSource.type,
+		multiplicity <- attSource.multiplicity
+	),		
+	setter : ClassDiagram!Method (
+		name <- 'set' + attSource.name.firstToUpper(),
+		returnType <- thisModule.voidType,
+		owner <- attTarget.owner
+	), 
+	param : ClassDiagram!Parameter (
+		name <- 'value',
+		type <- attTarget.type,
+		owner <- setter,
+		multiplicity <- 1
+	)
+}
+
+rule attributeHasNothing {
+from
+	attSource : ClassDiagram!Attribute (
+		not(attSource.hasSetter()) and not(attSource.hasGetter())
+	)
+to
+	attTarget : ClassDiagram!Attribute (
+		name <- attSource.name,
+		owner <- attSource.owner,
+		type <- attSource.type,
+		multiplicity <- attSource.multiplicity
+	),		
+	setter : ClassDiagram!Method (
+		name <- 'set' + attSource.name.firstToUpper(),
+		returnType <- thisModule.voidType,
+		owner <- attTarget.owner
+	),	
+	getter : ClassDiagram!Method (
+		name <- 'get' + attSource.name.firstToUpper(),
+		returnType <- attTarget.type,
+		owner <- attTarget.owner
+	), 
+	param : ClassDiagram!Parameter (
+		name <- 'value',
+		type <- attTarget.type,
+		owner <- setter,
+		multiplicity <- 1
+	)
+}

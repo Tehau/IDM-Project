@@ -1,0 +1,146 @@
+/* $Id:$ 
+ * Creation : December 10, 2013
+ * Licence  : EPL 
+ * Copyright:
+ * Authors  : 
+ *            ttsing
+ */
+@mainClass "transfos::Main"
+@mainOperation "main"
+
+//http://web.univ-pau.fr/~ecariou/cours/idm/docs/KerMeta-Manual.pdf
+package transfos;
+
+require kermeta
+
+// meta-modele du diagramme de classe
+require "platform:/resource/ClassDiagram/metaModels/ClassDiagram.ecore"
+
+// fonctions utilitaires Kermeta associees au MM de diagramme de classe
+require "platform:/resource/ClassDiagram/metaModels/ClassDiagramUtil.kmt"
+
+
+using kermeta::persistence
+using kermeta::exceptions
+using kermeta::standard
+
+// package du meta-modele
+using ClassDiagram
+
+// package des fonctions utilitaires
+using ClassDiagramUtil
+
+
+class Main
+{
+	// hack pour avoir n'importe ou une reference sur le type void
+	reference voidT : VoidType
+	
+	operation CheckInterface(c1 : ClassDiagram::Class, c2 : ClassDiagram::Class, methodNames : Set<Method> ) : Void is do
+		if(c1.name.equals(c2.name) == false)
+		then
+			stdio.writeln("C1 : "+c1.name)
+			stdio.writeln("C2 : "+c2.name)
+			//stdio.writeln(asSameMethod(m,m).toString())
+			c1.methods.each{m1|
+				c2.methods.each{m2|
+					if(asSameMethod(m1,m2))
+					then
+						//methodNames.add(m1)
+						//TODO Add dans le tableau et check si different
+						if(methodNames.size() == 0)
+						then
+							methodNames.add(m1)
+						else
+							methodNames.each{m|
+								stdio.writeln("ICI 2 :"+m.name)
+							}
+						end
+					end
+				}
+			}
+			AddInterface(methodNames)
+		else
+			stdio.writeln("Same Class dont add Interface")
+		end
+		
+	end
+	
+	// check if same method
+	operation asSameMethod(m1 : ClassDiagram::Method, m2 : ClassDiagram::Method) : Boolean is do
+		var check : Boolean init true
+		var i : Integer init 0
+		var j : Integer init 0
+		
+		if(m1.name.equals(m2.name))
+		then
+			m1.parameters.each{p1|
+				m2.parameters.each{p2|
+					stdio.writeln("	Nom : "+ m1.name +" parametre : " + p1.name +" type : " + p1.type.name)
+					stdio.writeln("	Nom : "+ m2.name +" parametre : " + p2.name +" type : " + p2.type.name)
+					/*
+					if(p1.type.name.equals(p2.type.name) == false)
+					then
+						check := false
+					end
+					*/
+					if(i == j and check == true)
+					then
+						check := p1.type.name.equals(p2.type.name)
+					end
+					j := j+1
+					stdio.writeln("	Check : "+p1.type.name.equals(p2.type.name).toString())
+				}
+				i := i+1
+				j := 0
+			}
+			if(m1.returnType.name.equals(m2.returnType.name) == false)
+			then
+				check := false
+			end
+		else
+			check := false
+		end
+		result := check
+	end
+	
+	operation AddInterface(methodTab : Set<Method>) : Void is do
+		stdio.writeln("On fait une interface OMG OMG")
+		
+	end
+	
+	operation main() : Void is do 
+
+		// creation of the util object for loading/saving/printing models
+		var util : ClassDiagramUtil::Util init ClassDiagramUtil::Util.new
+		
+		var source : ClassDiagram::ModelBase
+		var target : ClassDiagram::ModelBase
+		var methodeNames : Set<Method> init Set<Method>.new
+		var i : Integer init 1
+		var j : Integer init 1
+		
+		source := util.loadModel("platform:/resource/ClassDiagram/models/ModelBase.xmi")
+		voidT := source.voidT
+		
+		stdio.writeln(" === modele source ===\n")
+		stdio.writeln("")	
+		
+		source.allClasses.each{c1|
+			source.allClasses.each{c2|
+				if( i < j )
+				then
+					 CheckInterface(c1,c2,methodeNames)
+				else
+					stdio.writeln("Same Class or Already check")
+				end
+				
+				j := j+1
+			}
+			j := 1
+			i := i+1
+		}
+		
+	end
+
+}

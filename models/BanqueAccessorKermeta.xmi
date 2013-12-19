@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ClassDiagram="platform:/resource/ClassDiagram/metaModels/ClassDiagram.ecore">
+  <ClassDiagram:ModelBase>
+    <voidT href="#/1"/>
+    <stringT href="#/2"/>
+    <intT href="#/4"/>
+    <boolT href="#/3"/>
+    <allClasses href="#/5"/>
+    <allClasses href="#/16"/>
+    <allInterfaces href="#/24"/>
+    <allAssociations href="#/27"/>
+  </ClassDiagram:ModelBase>
+  <ClassDiagram:VoidType name="void"/>
+  <ClassDiagram:StringType name="string"/>
+  <ClassDiagram:BooleanType name="boolean"/>
+  <ClassDiagram:IntegerType name="integer"/>
+  <ClassDiagram:Class name="Account" interfaces="/24" associations="/28">
+    <attributes href="#/6"/>
+    <attributes href="#/7"/>
+    <attributes href="#/8"/>
+    <methods href="#/9"/>
+    <methods href="#/10"/>
+    <methods href="#/11"/>
+    <methods href="#/12"/>
+    <methods href="#/13"/>
+    <methods href="#/14"/>
+    <methods href="#/15"/>
+  </ClassDiagram:Class>
+  <ClassDiagram:Attribute name="id" type="/4" multiplicity="1">
+    <owner xsi:type="ClassDiagram:Class" href="#/5"/>
+  </ClassDiagram:Attribute>
+  <ClassDiagram:Attribute name="overdraft" type="/4" multiplicity="1">
+    <owner xsi:type="ClassDiagram:Class" href="#/5"/>
+  </ClassDiagram:Attribute>
+  <ClassDiagram:Attribute name="balance" type="/4" multiplicity="1">
+    <owner xsi:type="ClassDiagram:Class" href="#/5"/>
+  </ClassDiagram:Attribute>
+  <ClassDiagram:Method name="getOverdraft" returnType="/4">
+    <owner xsi:type="ClassDiagram:Class" href="#/5"/>
+  </ClassDiagram:Method>
+  <ClassDiagram:Method name="changeOverdraft" returnType="/1">
+    <owner xsi:type="ClassDiagram:Class" href="#/5"/>
+    <parameters name="val" type="/4" multiplicity="1"/>
+  </ClassDiagram:Method>
+  <ClassDiagram:Method name="getId" returnType="/4">
+    <owner xsi:type="ClassDiagram:Class" href="#/5"/>
+  </ClassDiagram:Method>
+  <ClassDiagram:Method name="setId" returnType="/1">
+    <owner xsi:type="ClassDiagram:Class" href="#/5"/>
+    <parameters name="value" type="/4" multiplicity="1"/>
+  </ClassDiagram:Method>
+  <ClassDiagram:Method name="setOverdraft" returnType="/1">
+    <owner xsi:type="ClassDiagram:Class" href="#/5"/>
+    <parameters name="value" type="/4" multiplicity="1"/>
+  </ClassDiagram:Method>
+  <ClassDiagram:Method name="getBalance" returnType="/4">
+    <owner xsi:type="ClassDiagram:Class" href="#/5"/>
+  </ClassDiagram:Method>
+  <ClassDiagram:Method name="setBalance" returnType="/1">
+    <owner xsi:type="ClassDiagram:Class" href="#/5"/>
+    <parameters name="value" type="/4" multiplicity="1"/>
+  </ClassDiagram:Method>
+  <ClassDiagram:Class name="Client" associations="/29">
+    <attributes href="#/17"/>
+    <attributes href="#/18"/>
+    <methods href="#/19"/>
+    <methods href="#/20"/>
+    <methods href="#/21"/>
+    <methods href="#/22"/>
+    <methods href="#/23"/>
+  </ClassDiagram:Class>
+  <ClassDiagram:Attribute name="name" type="/2" multiplicity="1">
+    <owner xsi:type="ClassDiagram:Class" href="#/16"/>
+  </ClassDiagram:Attribute>
+  <ClassDiagram:Attribute name="addr" type="/2" multiplicity="1">
+    <owner xsi:type="ClassDiagram:Class" href="#/16"/>
+  </ClassDiagram:Attribute>
+  <ClassDiagram:Method name="getName" returnType="/2">
+    <owner xsi:type="ClassDiagram:Class" href="#/16"/>
+  </ClassDiagram:Method>
+  <ClassDiagram:Method name="changeAddr" returnType="/1">
+    <owner xsi:type="ClassDiagram:Class" href="#/16"/>
+    <parameters name="addr" type="/2" multiplicity="1"/>
+  </ClassDiagram:Method>
+  <ClassDiagram:Method name="setName" returnType="/1">
+    <owner xsi:type="ClassDiagram:Class" href="#/16"/>
+    <parameters name="value" type="/2" multiplicity="1"/>
+  </ClassDiagram:Method>
+  <ClassDiagram:Method name="getAddr" returnType="/2">
+    <owner xsi:type="ClassDiagram:Class" href="#/16"/>
+  </ClassDiagram:Method>
+  <ClassDiagram:Method name="setAddr" returnType="/1">
+    <owner xsi:type="ClassDiagram:Class" href="#/16"/>
+    <parameters name="value" type="/2" multiplicity="1"/>
+  </ClassDiagram:Method>
+  <ClassDiagram:Interface name="IOperations" implementedBy="/5">
+    <methods href="#/25"/>
+    <methods href="#/26"/>
+  </ClassDiagram:Interface>
+  <ClassDiagram:Method name="whitdraw" returnType="/1">
+    <owner xsi:type="ClassDiagram:Interface" href="#/24"/>
+    <parameters name="val" type="/4" multiplicity="1"/>
+  </ClassDiagram:Method>
+  <ClassDiagram:Method name="deposit" returnType="/1">
+    <owner xsi:type="ClassDiagram:Interface" href="#/24"/>
+    <parameters name="val" type="/4" multiplicity="1"/>
+  </ClassDiagram:Method>
+  <ClassDiagram:Association name="">
+    <ends href="#/28"/>
+    <ends href="#/29"/>
+  </ClassDiagram:Association>
+  <ClassDiagram:AssociationEnd name="accounts" lowerBound="1" upperBound="-1" _class="/5">
+    <association href="#/27"/>
+  </ClassDiagram:AssociationEnd>
+  <ClassDiagram:AssociationEnd name="owner" lowerBound="1" upperBound="1" _class="/16">
+    <association href="#/27"/>
+  </ClassDiagram:AssociationEnd>
+</xmi:XMI>
