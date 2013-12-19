@@ -30,36 +30,61 @@ using ClassDiagram
 // package des fonctions utilitaires
 using ClassDiagramUtil
 
-
 class Main
 {
 	// hack pour avoir n'importe ou une reference sur le type void
 	reference voidT : VoidType
 	
-	operation CheckInterface(c1 : ClassDiagram::Class, c2 : ClassDiagram::Class, methodNames : Set<Method> ) : Void is do
+	
+	operation AddInterface(source : ClassDiagram::ModelBase) : Void is do
+		var i : Integer init 1
+		var j : Integer init 1
+		var methodNames : seq Method[1..*] init Sequence<Method>.new
+		source.allClasses.each{c1|
+			source.allClasses.each{c2|
+				if( i < j )
+				then
+					CheckInterface(c1,c2,methodNames)
+				else
+					stdio.writeln("Same Class or Already check")
+				end
+				j := j+1
+			}
+			j := 1
+			i := i+1
+		}
+		MakeInterface(methodNames)
+	end
+	
+	operation CheckInterface(c1 : ClassDiagram::Class, c2 : ClassDiagram::Class, methodNames : Sequence<Method> ) : Void is do
+		var check : Boolean init true
 		if(c1.name.equals(c2.name) == false)
 		then
 			stdio.writeln("C1 : "+c1.name)
 			stdio.writeln("C2 : "+c2.name)
-			//stdio.writeln(asSameMethod(m,m).toString())
 			c1.methods.each{m1|
 				c2.methods.each{m2|
 					if(asSameMethod(m1,m2))
 					then
-						//methodNames.add(m1)
-						//TODO Add dans le tableau et check si different
 						if(methodNames.size() == 0)
 						then
 							methodNames.add(m1)
 						else
+							check := false
 							methodNames.each{m|
-								stdio.writeln("ICI 2 :"+m.name)
+								if(m.name.equals(m1.name))
+								then
+									check := true
+								end
 							}
+							if(check == false)
+							then
+								methodNames.add(m1)
+							end
 						end
 					end
 				}
 			}
-			AddInterface(methodNames)
 		else
 			stdio.writeln("Same Class dont add Interface")
 		end
@@ -78,12 +103,6 @@ class Main
 				m2.parameters.each{p2|
 					stdio.writeln("	Nom : "+ m1.name +" parametre : " + p1.name +" type : " + p1.type.name)
 					stdio.writeln("	Nom : "+ m2.name +" parametre : " + p2.name +" type : " + p2.type.name)
-					/*
-					if(p1.type.name.equals(p2.type.name) == false)
-					then
-						check := false
-					end
-					*/
 					if(i == j and check == true)
 					then
 						check := p1.type.name.equals(p2.type.name)
@@ -104,10 +123,19 @@ class Main
 		result := check
 	end
 	
-	operation AddInterface(methodTab : Set<Method>) : Void is do
-		stdio.writeln("On fait une interface OMG OMG")
-		
+	operation MakeInterface(methodNames : Sequence<Method>) : Void is do
+		stdio.writeln("Make Interface")
+		//TODO 	Faire des interfaces avec les Methodes dans le tableau
+		//		Faire le merge des interfaces si des classes utilisent les même
+		var int : ClassDiagram::Interface
+		methodNames.each{m|
+			int := ClassDiagram::Interface.new
+			int.name := "set" + m.name.substring(0,1).toUpperCase + m.name.substring(1,m.name.size)
+			//int.
+		}
 	end
+	
+	
 	
 	operation main() : Void is do 
 
@@ -116,30 +144,12 @@ class Main
 		
 		var source : ClassDiagram::ModelBase
 		var target : ClassDiagram::ModelBase
-		var methodeNames : Set<Method> init Set<Method>.new
-		var i : Integer init 1
-		var j : Integer init 1
 		
 		source := util.loadModel("platform:/resource/ClassDiagram/models/ModelBase.xmi")
 		voidT := source.voidT
 		
-		stdio.writeln(" === modele source ===\n")
-		stdio.writeln("")	
-		
-		source.allClasses.each{c1|
-			source.allClasses.each{c2|
-				if( i < j )
-				then
-					 CheckInterface(c1,c2,methodeNames)
-				else
-					stdio.writeln("Same Class or Already check")
-				end
-				
-				j := j+1
-			}
-			j := 1
-			i := i+1
-		}
+		stdio.writeln(" === modele source ===")
+		AddInterface(source)
 		
 	end
 
