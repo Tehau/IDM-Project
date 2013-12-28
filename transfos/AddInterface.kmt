@@ -36,32 +36,35 @@ class Main
 	reference voidT : VoidType
 	
 	
-	operation AddInterface(source : ClassDiagram::ModelBase) : Void is do
+	operation AddInterface(base : ClassDiagram::ModelBase) : ClassDiagram::ModelBase is do
 		var i : Integer init 1
 		var j : Integer init 1
 		var methodNames : seq Method[1..*] init Sequence<Method>.new
-		source.allClasses.each{c1|
-			source.allClasses.each{c2|
+		base.allClasses.each{c1|
+			base.allClasses.each{c2|
 				if( i < j )
 				then
 					CheckInterface(c1,c2,methodNames)
 				else
-					stdio.writeln("Same Class or Already check")
+					//stdio.writeln("Same Class or Already check")
 				end
 				j := j+1
 			}
 			j := 1
 			i := i+1
 		}
-		MakeInterface(methodNames)
+		base := MakeInterface(methodNames,base)
+		base := asSameInterface(base)
+		//Return Model with interfaces
+		result := base
 	end
 	
 	operation CheckInterface(c1 : ClassDiagram::Class, c2 : ClassDiagram::Class, methodNames : Sequence<Method> ) : Void is do
 		var check : Boolean init true
 		if(c1.name.equals(c2.name) == false)
 		then
-			stdio.writeln("C1 : "+c1.name)
-			stdio.writeln("C2 : "+c2.name)
+			//stdio.writeln("C1 : "+c1.name)
+			//stdio.writeln("C2 : "+c2.name)
 			c1.methods.each{m1|
 				c2.methods.each{m2|
 					if(asSameMethod(m1,m2))
@@ -86,7 +89,7 @@ class Main
 				}
 			}
 		else
-			stdio.writeln("Same Class dont add Interface")
+			//stdio.writeln("Same Class dont add Interface")
 		end
 		
 	end
@@ -101,14 +104,14 @@ class Main
 		then
 			m1.parameters.each{p1|
 				m2.parameters.each{p2|
-					stdio.writeln("	Nom : "+ m1.name +" parametre : " + p1.name +" type : " + p1.type.name)
-					stdio.writeln("	Nom : "+ m2.name +" parametre : " + p2.name +" type : " + p2.type.name)
+					//stdio.writeln("	Nom : "+ m1.name +" parametre : " + p1.name +" type : " + p1.type.name)
+					//stdio.writeln("	Nom : "+ m2.name +" parametre : " + p2.name +" type : " + p2.type.name)
 					if(i == j and check == true)
 					then
 						check := p1.type.name.equals(p2.type.name)
 					end
 					j := j+1
-					stdio.writeln("	Check : "+p1.type.name.equals(p2.type.name).toString())
+					//stdio.writeln("	Check : "+p1.type.name.equals(p2.type.name).toString())
 				}
 				i := i+1
 				j := 0
@@ -123,19 +126,74 @@ class Main
 		result := check
 	end
 	
-	operation MakeInterface(methodNames : Sequence<Method>) : Void is do
-		stdio.writeln("Make Interface")
-		//TODO 	Faire des interfaces avec les Methodes dans le tableau
-		//		Faire le merge des interfaces si des classes utilisent les même
+	operation MakeInterface(methodNames : Sequence<Method>,base : ClassDiagram::ModelBase) : ClassDiagram::ModelBase is do
+		//stdio.writeln("Make Interface")
 		var int : ClassDiagram::Interface
-		methodNames.each{m|
+		methodNames.each{m1|
 			int := ClassDiagram::Interface.new
-			int.name := "set" + m.name.substring(0,1).toUpperCase + m.name.substring(1,m.name.size)
-			//int.
+			int.name := "Interface" + m1.name.substring(0,1).toUpperCase + m1.name.substring(1,m1.name.size)
+			//stdio.writeln("Interface Name : "+int.name)
+			//Rajout de la class qui implemente l'interface
+			base.allClasses.each{c|
+				c.methods.each{m2|
+					if(m1.name.equals(m2.name))
+					then 
+						int.implementedBy.add(c)
+						c.methods.remove(m2)
+					end
+				}
+			}
+			int.methods.add(m1)
+			base.allInterfaces.add(int)
 		}
+		
+		result := base
 	end
 	
 	
+	operation asSameInterface(base : ClassDiagram::ModelBase) : ClassDiagram::ModelBase is do
+		
+		var i : Integer init 1
+		var j : Integer init 1
+		var sizeOrigin : Integer
+		
+		//Permet de garder le nombre d'origin de nos interfaces pour ne pas avoir des problemes lors d'un nouvel ajout
+		//
+		sizeOrigin := base.allInterfaces.size()
+		
+		base.allInterfaces.each{i1|
+			base.allInterfaces.each{i2|
+				//stdio.writeln("i1 : "+i1.name+" i2 : "+i2.name+" = "+i1.implementedBy.equals(i2.implementedBy).toString())
+				if( i < j and i1.implementedBy.equals(i2.implementedBy) and i < sizeOrigin)
+				then
+					base.allInterfaces.add(MergeInterface(i1,i2))
+					i1.implementedBy.clear()
+					i2.implementedBy.clear()
+					base.allInterfaces.remove(i1)
+					base.allInterfaces.remove(i2)
+				end
+				j := j+1
+			}
+			j := 1
+			i := i+1
+		}
+		
+		result := base
+	end
+	
+	operation MergeInterface(int1 : ClassDiagram::Interface, int2 : ClassDiagram::Interface) : ClassDiagram::Interface is do
+		//TODO
+		//Faire le merge des interfaces si des classes utilisent les meme
+		//	Regarder dans les interfaces quelle classe implemente notre interface
+		var int : ClassDiagram::Interface
+		int := ClassDiagram::Interface.new
+		int.name := "Interface" + int1.name.substring(9,int1.name.size).toUpperCase + int2.name.substring(9,int2.name.size)
+		int1.implementedBy.each{c|
+			int.implementedBy.add(c)
+		}
+		
+		result := int
+	end
 	
 	operation main() : Void is do 
 
@@ -149,8 +207,16 @@ class Main
 		voidT := source.voidT
 		
 		stdio.writeln(" === modele source ===")
-		AddInterface(source)
+		util.printModel(source)
 		
+		stdio.writeln(" === Traitement ===\n")
+		target := AddInterface(source)
+		
+		stdio.writeln(" === modele cible ====")
+		util.printModel(target)
+		
+		util.saveModel(target, "platform:/resource/ClassDiagram/models/ModelBaseInterfaceKermeta.xmi")
+		stdio.writeln(" === modele cible sauvegarde ===")
 	end
 
 }

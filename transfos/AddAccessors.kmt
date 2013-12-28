@@ -118,7 +118,7 @@ class Main
 		var source : ClassDiagram::ModelBase
 		var target : ClassDiagram::ModelBase
 		
-		source := util.loadModel("platform:/resource/ClassDiagram/models/ModelBase.xmi")
+		source := util.loadModel("platform:/resource/ClassDiagram/models/Banque.xmi")
 		voidT := source.voidT
 		
 		stdio.writeln(" === modele source ===\n")
@@ -130,7 +130,7 @@ class Main
 		stdio.writeln("\n === modele cible ====\n")
 		util.printModel(target)
 			
-		util.saveModel(target, "platform:/resource/ClassDiagram/models/ModelBaseAccessorKermeta.xmi")
+		util.saveModel(target, "platform:/resource/ClassDiagram/models/BanqueAccessorKermeta.xmi")
 		stdio.writeln(" === modele cible sauvegarde ===")
 		
 	end

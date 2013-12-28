@@ -16,13 +16,21 @@
     <methods name="M3" returnType="//@voidT">
       <parameters name="P3" type="//@stringT"/>
     </methods>
-    <methods name="M2" returnType="//@voidT">
-      <parameters name="P2" type="//@stringT"/>
+    <methods name="M4" returnType="//@voidT">
+      <parameters name="P4" type="//@stringT"/>
     </methods>
   </allClasses>
   <allClasses name="C">
-    <methods name="M2" returnType="//@voidT">
-      <parameters name="P2" type="//@stringT"/>
+    <methods name="M1" returnType="//@voidT">
+      <parameters name="P1" type="//@stringT"/>
+    </methods>
+    <methods name="M5" returnType="//@voidT">
+      <parameters name="P5" type="//@stringT"/>
+    </methods>
+  </allClasses>
+  <allClasses name="D">
+    <methods name="M4" returnType="//@voidT">
+      <parameters name="P4" type="//@stringT"/>
     </methods>
     <methods name="M3" returnType="//@voidT">
       <parameters name="P3" type="//@stringT"/>
