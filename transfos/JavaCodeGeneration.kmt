@@ -1,0 +1,133 @@
+/* $Id:$ 
+ * Creation : December 29, 2013
+ * Licence  : EPL 
+ * Copyright:
+ * Authors  : 
+ *            Wandy
+ */
+@mainClass "transfos::Main"
+@mainOperation "main"
+
+
+package transfos;
+
+require "platform:/resource/ClassDiagram/metaModels/ClassDiagram.ecore"
+require "platform:/resource/ClassDiagram/metaModels/ClassDiagramUtil.kmt"
+
+require kermeta
+using kermeta::persistence
+using kermeta::exceptions
+using kermeta::standard
+using kermeta::io
+
+// package du meta-modele
+using ClassDiagram
+
+// package des fonctions utilitaires
+using ClassDiagramUtil
+class Main
+{
+	// hack pour avoir n'importe ou une reference sur le type void
+	reference voidT : VoidType
+	
+	operation GenerateCode(base : ClassDiagram::ModelBase) : Void is do
+	var code : String
+	var io : FileIO init FileIO.new
+	var colInterface : Collection<Interface>
+	var colAttribut : Collection<Attribute>
+	var colParametre : Collection<Parameter>
+	
+	/**** Generation du code pour chaque class ****/
+	base.allClasses.each { cl |
+		code := "public class " + cl.name.toString()
+		colInterface := base.allInterfaces.select{ i | i.implementedBy.includes(cl)}
+		if not (colInterface.size() == 0) 
+		then
+			code := code + " implements " 
+			/** implements **/
+			var i : Integer init 0
+			colInterface.each{ int |
+					i := i+1
+					if(i == colInterface.size())
+					then
+						code := code +  int.name.toString()
+					else
+						code := code +  int.name.toString() + ", "
+					end		
+			}
+		end
+		code := code + "\n{\n"
+		
+		/**** Generation des attributs ****/
+		colAttribut := cl.attributes
+		colAttribut.each{ at |
+				code := code + "\tprivate" + " " + at.type.name.toString + " " + at.name.toString + ";\n"
+		}
+		
+		/**** Generation du Constructeur ****/
+		code := code + "\n\tpublic " + cl.name.toString() + "("
+		if not (colAttribut.size() == 0) 
+		then
+			var i : Integer init 0
+			colAttribut.each{ a |
+				i := i + 1
+				if(i == colAttribut.size())
+				then
+					code := code + a.type.name.toString() + " " + a.name.toString()
+				else
+					code := code + a.type.name.toString() + " " + a.name.toString() + ", "
+				end		
+			}
+		end
+		code := code + ") \n\t{\n"
+		/** Construceur : Affectation des parametres avec les attributs **/
+		colAttribut.each{ a |
+			code := code + "\t\tthis." + a.name.toString + " = " + a.name.toString + ";\n"
+		}
+		code := code + "\t}\n\n"
+		
+		/**** Generation des Methodes ****/
+		cl.methods.each{ met |
+			code := code + "\tpublic " + met.returnType.name.toString() + " " + met.name.toString() + "("
+			
+			colParametre := met.parameters
+		    if not (colParametre.size() == 0) 
+			then
+				var i : Integer init 0
+				colParametre.each{ par |
+					i := i + 1
+					if(i == colParametre.size())
+					then
+						code := code + par.type.name.toString() + " " + par.name.toString()
+					else
+						code := code + par.type.name.toString() + " " + par.name.toString() + ", "
+					end		
+				}
+			end
+			
+			code := code + ")\n\t{\n \t\t// **TODO: implement 'Method' operation **\n" 
+			if not (met.returnType.name.toString() == "void" )
+			then
+				code := code + "\n\t\treturn "
+			end
+			code := code + "\n\t}\n\n"
+		}
+		code := code + "\n}"
+		io.writeTextFile("platform:/resource/ClassDiagram/transfos/GenerateCode/"+ cl.name.toString+".java",code)
+	}
+	end
+	
+	operation main() : Void is do 
+		
+		var util : ClassDiagramUtil::Util init ClassDiagramUtil::Util.new
+		
+		var source : ClassDiagram::ModelBase
+		var target : ClassDiagram::ModelBase
+		source := util.loadModel("platform:/resource/ClassDiagram/models/ModelBaseInterfaceKermeta.xmi")
+		voidT := source.voidT
+		
+		stdio.writeln(" === Generation de Code ===\n")
+		GenerateCode(source)
+		
+	end
+}

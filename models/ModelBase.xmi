@@ -5,6 +5,7 @@
   <intT name="integer"/>
   <boolT name="boolean"/>
   <allClasses name="A">
+    <attributes name="A1" type="//@stringT"/>
     <methods name="M1" returnType="//@voidT">
       <parameters name="P1" type="//@stringT"/>
     </methods>
@@ -13,6 +14,7 @@
     </methods>
   </allClasses>
   <allClasses name="B">
+    <attributes name="A2" type="//@stringT"/>
     <methods name="M3" returnType="//@voidT">
       <parameters name="P3" type="//@stringT"/>
     </methods>
@@ -21,6 +23,7 @@
     </methods>
   </allClasses>
   <allClasses name="C">
+    <attributes name="A3" type="//@stringT"/>
     <methods name="M1" returnType="//@voidT">
       <parameters name="P1" type="//@stringT"/>
     </methods>
@@ -29,6 +32,7 @@
     </methods>
   </allClasses>
   <allClasses name="D">
+    <attributes name="A4" type="//@stringT"/>
     <methods name="M4" returnType="//@voidT">
       <parameters name="P4" type="//@stringT"/>
     </methods>

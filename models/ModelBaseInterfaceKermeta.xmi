@@ -6,38 +6,56 @@
     <intT href="#/4"/>
     <boolT href="#/3"/>
     <allClasses href="#/5"/>
-    <allClasses href="#/7"/>
     <allClasses href="#/8"/>
     <allClasses href="#/10"/>
-    <allInterfaces href="#/11"/>
-    <allInterfaces href="#/13"/>
+    <allClasses href="#/13"/>
+    <allInterfaces href="#/15"/>
+    <allInterfaces href="#/17"/>
   </ClassDiagram:ModelBase>
   <ClassDiagram:VoidType name="void"/>
   <ClassDiagram:StringType name="string"/>
   <ClassDiagram:BooleanType name="boolean"/>
   <ClassDiagram:IntegerType name="integer"/>
-  <ClassDiagram:Class name="A" interfaces="/11">
-    <methods href="#/6"/>
+  <ClassDiagram:Class name="A" interfaces="/15">
+    <attributes href="#/6"/>
+    <methods href="#/7"/>
   </ClassDiagram:Class>
+  <ClassDiagram:Attribute name="A1" type="/2">
+    <owner xsi:type="ClassDiagram:Class" href="#/5"/>
+  </ClassDiagram:Attribute>
   <ClassDiagram:Method name="M2" returnType="/1">
     <owner xsi:type="ClassDiagram:Class" href="#/5"/>
     <parameters name="P2" type="/2"/>
   </ClassDiagram:Method>
-  <ClassDiagram:Class name="B" interfaces="/13"/>
-  <ClassDiagram:Class name="C" interfaces="/11">
-    <methods href="#/9"/>
+  <ClassDiagram:Class name="B" interfaces="/17">
+    <attributes href="#/9"/>
   </ClassDiagram:Class>
-  <ClassDiagram:Method name="M5" returnType="/1">
+  <ClassDiagram:Attribute name="A2" type="/2">
     <owner xsi:type="ClassDiagram:Class" href="#/8"/>
+  </ClassDiagram:Attribute>
+  <ClassDiagram:Class name="C" interfaces="/15">
+    <attributes href="#/11"/>
+    <methods href="#/12"/>
+  </ClassDiagram:Class>
+  <ClassDiagram:Attribute name="A3" type="/2">
+    <owner xsi:type="ClassDiagram:Class" href="#/10"/>
+  </ClassDiagram:Attribute>
+  <ClassDiagram:Method name="M5" returnType="/1">
+    <owner xsi:type="ClassDiagram:Class" href="#/10"/>
     <parameters name="P5" type="/2"/>
   </ClassDiagram:Method>
-  <ClassDiagram:Class name="D" interfaces="/13"/>
-  <ClassDiagram:Interface name="InterfaceM1" implementedBy="/5 /8">
-    <methods href="#/12"/>
+  <ClassDiagram:Class name="D" interfaces="/17">
+    <attributes href="#/14"/>
+  </ClassDiagram:Class>
+  <ClassDiagram:Attribute name="A4" type="/2">
+    <owner xsi:type="ClassDiagram:Class" href="#/13"/>
+  </ClassDiagram:Attribute>
+  <ClassDiagram:Interface name="InterfaceM1" implementedBy="/5 /10">
+    <methods href="#/16"/>
   </ClassDiagram:Interface>
   <ClassDiagram:Method name="M1" returnType="/1">
-    <owner xsi:type="ClassDiagram:Interface" href="#/11"/>
+    <owner xsi:type="ClassDiagram:Interface" href="#/15"/>
     <parameters name="P1" type="/2"/>
   </ClassDiagram:Method>
-  <ClassDiagram:Interface name="InterfaceM3M4" implementedBy="/7 /10"/>
+  <ClassDiagram:Interface name="InterfaceM3M4" implementedBy="/8 /13"/>
 </xmi:XMI>
