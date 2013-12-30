@@ -37,7 +37,7 @@ class Main
 	var colAttribut : Collection<Attribute>
 	var colParametre : Collection<Parameter>
 	
-	/**** Generation du code pour chaque class ****/
+	/******* Generation du code pour chaque class *******/
 	base.allClasses.each { cl |
 		code := "public class " + cl.name.toString()
 		colInterface := base.allInterfaces.select{ i | i.implementedBy.includes(cl)}
@@ -112,8 +112,48 @@ class Main
 			end
 			code := code + "\n\t}\n\n"
 		}
-		code := code + "\n}"
+		
+		/**** Generation des Accesseurs ****/
+		colAttribut.each{ a |	
+				//Getter			
+				code := code + "\tpublic" + " " + a.type.name.toString + " " + "get"+ a.name.substring(0,1).toUpperCase + a.name.substring(1,a.name.size) + "()\n\t{\n"
+				code := code + "\t\treturn this." + a.name.toString+";\n\t}\n\n"
+				//Setter				
+				code := code + "\tpublic" + " " + "void" + " " + "set"+ a.name.substring(0,1).toUpperCase + a.name.substring(1,a.name.size) + "("
+				code := code + a.type.name.toString + " " + a.name.toString + ")\n\t{\n"
+				code := code + "\t\tthis." + a.name.toString + " = " + a.name.toString + ";\n\t}\n" 
+		}
+		
+		code := code + "}"
 		io.writeTextFile("platform:/resource/ClassDiagram/transfos/GenerateCode/"+ cl.name.toString+".java",code)
+	}
+	
+	/******* Generation du code pour chaque Interface *******/
+	base.allInterfaces.each{i|
+		code := "public interface " + i.name.toString() + "\n{\n"
+		i.methods.each { met |
+			code := code +" "+ met.returnType.name.toString()  + " " + met.name.toString() + "("
+			colParametre := met.parameters 
+			met.parameters.each { pa |					
+			    if not (colParametre.size() == 0) 
+				then
+					var entier : Integer
+					entier := 0
+					colParametre.each{ pa |
+						entier := entier + 1
+						if(entier == colParametre.size())
+						then
+							code := code + pa.type.name.toString + " " + pa.name.toString
+						else
+							code := code + pa.type.name.toString + " " + pa.name.toString + ", "
+						end		
+					}
+				end
+			}//fin des methods.each
+			code := code + ");\n\n"
+		}
+		code := code + "}"
+		io.writeTextFile("platform:/resource/ClassDiagram/transfos/GenerateCode/"+ i.name.toString+".java",code)
 	}
 	end
 	

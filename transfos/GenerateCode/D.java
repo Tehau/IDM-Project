@@ -7,5 +7,13 @@ public class D implements InterfaceM3M4
 		this.A4 = A4;
 	}
 
+	public string getA4()
+	{
+		return this.A4;
+	}
 
+	public void setA4(string A4)
+	{
+		this.A4 = A4;
+	}
 }

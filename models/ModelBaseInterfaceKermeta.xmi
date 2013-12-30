@@ -57,5 +57,16 @@
     <owner xsi:type="ClassDiagram:Interface" href="#/15"/>
     <parameters name="P1" type="/2"/>
   </ClassDiagram:Method>
-  <ClassDiagram:Interface name="InterfaceM3M4" implementedBy="/8 /13"/>
+  <ClassDiagram:Interface name="InterfaceM3M4" implementedBy="/8 /13">
+    <methods href="#/18"/>
+    <methods href="#/19"/>
+  </ClassDiagram:Interface>
+  <ClassDiagram:Method name="M3" returnType="/1">
+    <owner xsi:type="ClassDiagram:Interface" href="#/17"/>
+    <parameters name="P3" type="/2"/>
+  </ClassDiagram:Method>
+  <ClassDiagram:Method name="M4" returnType="/1">
+    <owner xsi:type="ClassDiagram:Interface" href="#/17"/>
+    <parameters name="P4" type="/2"/>
+  </ClassDiagram:Method>
 </xmi:XMI>

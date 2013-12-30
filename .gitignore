@@ -6,3 +6,4 @@ src/*
 plugin.xml
 .classpath
 .project
+.settings/*

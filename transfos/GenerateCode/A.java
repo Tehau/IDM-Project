@@ -9,9 +9,17 @@ public class A implements InterfaceM1
 
 	public void M2(string P2)
 	{
- 		** // TODO: implement 'Method' operation **
- 		
+ 		// **TODO: implement 'Method' operation **
+
 	}
 
+	public string getA1()
+	{
+		return this.A1;
+	}
 
+	public void setA1(string A1)
+	{
+		this.A1 = A1;
+	}
 }

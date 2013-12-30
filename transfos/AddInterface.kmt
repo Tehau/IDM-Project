@@ -170,6 +170,12 @@ class Main
 		int1.implementedBy.each{c|
 			int.implementedBy.add(c)
 		}
+		int1.methods.each{m|
+			int.methods.add(m)
+		}
+		int2.methods.each{m|
+			int.methods.add(m)
+		}
 		result := int
 	end
 	
